@@ -36,14 +36,14 @@ zenauracore single_static 0000ff
 zenauracore single_static 00ff00
 zenauracore single_static ffff00
 ```
-Certain colors also work just like in rogauracore:
+You can also pass in any supported color above as an argument:
 ```sh
 zenauracore red
 ```
 
 If your keyboard remains dark, its brightness might have defaulted to 0. Try:
 ```sh
-sudo zenauracore brightness 3
+zenauracore brightness 3
 ```
 
 ## Dependencies
