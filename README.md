@@ -24,6 +24,7 @@ COMMAND should be one of:
    brightness
    initialize_keyboard
 ```
+There are currently more modes supported by this laptop but I have not reverse-engineered them yet. Hopefully more to come.
 
 I have found that upon boot you will likely need to run
 ```sh
