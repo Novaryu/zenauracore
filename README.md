@@ -10,7 +10,7 @@ Supports the Asus Zenbook UX7602ZM RGB keyboard with ID [0b05:8854](https://linu
 Usage:
    zenauracore COMMAND ARGUMENTS
 
-Supported Commands:
+Supported Commands [Arguments]:
    initialize_keyboard
    brightness [1-3]
    single_static [color]
