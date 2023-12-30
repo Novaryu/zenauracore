@@ -8,6 +8,7 @@
  *
  * Description:
  *    RGB keyboard control for Asus ROG laptops
+ *    Adapted for the Asus Zenbook UX7602ZM
  *
  * Revision Information:
  *
@@ -18,10 +19,12 @@
  *          - Generalized speed specification mechanism to accomodate brightness
  *            or other integer values.
  *
- * \file rogauracore.c
+ * \file zenauracore.c
  */
 
 // sudo apt install libusb-1.0-0 libusb-1.0-0-dev
+// or (arch):
+// pacman -S libusb
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -51,7 +54,7 @@ extern int errno;
 #include <stdint.h>
 #include <libusb-1.0/libusb.h>
 
-#define MESSAGE_LENGTH 17
+#define MESSAGE_LENGTH 64
 #define MAX_NUM_MESSAGES 6
 #define MAX_NUM_COLORS 4
 #define MAX_NUM_SCALARS 4
@@ -112,7 +115,7 @@ const int BRIGHTNESS_OFFSET = 4;
 uint8_t MESSAGE_BRIGHTNESS[MESSAGE_LENGTH] = {0x5a, 0xba, 0xc5, 0xc4};
 uint8_t MESSAGE_SET[MESSAGE_LENGTH] = {0x5d, 0xb5};
 uint8_t MESSAGE_APPLY[MESSAGE_LENGTH] = {0x5d, 0xb4};
-uint8_t MESSAGE_INITIALIZE_KEYBOARD[MESSAGE_LENGTH] = {0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e, 0x00};
+uint8_t MESSAGE_INITIALIZE_KEYBOARD[MESSAGE_LENGTH] = {0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e};
 
 void
 initMessage(uint8_t *msg) {
@@ -124,13 +127,24 @@ initMessage(uint8_t *msg) {
 void
 single_static(Arguments *args, Messages *outputs) {
     V(printf("single_static\n"));
-    outputs->nMessages = 1;
-    uint8_t *m = outputs->messages[0];
-    initMessage(m);
-    m[4] = args->colors[0].nRed;
-    m[5] = args->colors[0].nGreen;
-    m[6] = args->colors[0].nBlue;
+    outputs->nMessages = 2;
+	for (int i = 0; i < 2; ++i) {
+		uint8_t *m = outputs->messages[i];
+		m[0] = 0x5c;
+		if (i == 0) {
+		m[1] = 0xa0;
+		}
+		if (i == 1) {
+		m[1] = 0xa5;
+		}
+		m[2] = 0x00;
+		m[3] = 0x00;
+		m[4] = args->colors[0].nRed;
+		m[5] = args->colors[0].nGreen;
+		m[6] = args->colors[0].nBlue;
+	}
 }
+
 
 void
 single_breathing(Arguments *args, Messages *outputs) {
@@ -206,6 +220,7 @@ rainbow_cycle(Arguments *args, Messages *outputs) {
 }
 
 void
+
 set_brightness(Arguments *args, Messages *outputs) {
     V(printf("single_static\n"));
     memcpy(outputs->messages[0], MESSAGE_BRIGHTNESS, MESSAGE_LENGTH);
@@ -302,13 +317,14 @@ rainbow(Arguments *args, Messages *messages) {
 #define SPEED { "SPEED", "speed", 1, 3 }
 #define BRIGHTNESS { "BRIGHTNESS", "brightness", 0, 3 }
 
+// Currently have commented-out entries not yet reverse-engineered
 const FunctionRecord FUNCTION_RECORDS[] = {
     {"single_static", &single_static, 1, 0},
-    {"single_breathing", &single_breathing, 2, 1, {SPEED}},
-    {"single_colorcycle", &single_colorcycle, 0, 1, {SPEED}},
-    {"multi_static", &multi_static, 4, 0},
-    {"multi_breathing", &multi_breathing, 4, 1, {SPEED}},
-    {"rainbow_cycle", &rainbow_cycle, 0, 1, {SPEED}},
+    // {"single_breathing", &single_breathing, 2, 1, {SPEED}},
+    // {"single_colorcycle", &single_colorcycle, 0, 1, {SPEED}},
+    // {"multi_static", &multi_static, 4, 0},
+    // {"multi_breathing", &multi_breathing, 4, 1, {SPEED}},
+    // {"rainbow_cycle", &rainbow_cycle, 0, 1, {SPEED}},
     {"red", &red, 0, 0},
     {"green", &green, 0, 0},
     {"blue", &blue, 0, 0},
@@ -318,7 +334,7 @@ const FunctionRecord FUNCTION_RECORDS[] = {
     {"magenta", &magenta, 0, 0},
     {"white", &white, 0, 0},
     {"black", &black, 0, 0},
-    {"rainbow", &rainbow, 0, 0},
+    // {"rainbow", &rainbow, 0, 0},
     {"brightness", &set_brightness, 0, 1, {BRIGHTNESS}},
     {"initialize_keyboard", &initialize_keyboard, 0, 0},
 };
@@ -481,7 +497,7 @@ parseArguments(int argc, char **argv, Messages *messages) {
 // ------------------------------------------------------------
 
 const uint16_t ASUS_VENDOR_ID = 0x0b05;
-const uint16_t ASUS_PRODUCT_IDS[] = { 0x1854, 0x1869, 0x1866, 0x19b6 };
+const uint16_t ASUS_PRODUCT_IDS[] = { 0x1854, 0x1869, 0x1866, 0x19b6, 0x8854 };
 const int NUM_ASUS_PRODUCTS = (int)(sizeof(ASUS_PRODUCT_IDS) / sizeof(ASUS_PRODUCT_IDS[0]));
 
 int
@@ -506,7 +522,7 @@ controlTransfer(libusb_device_handle *pHandle, unsigned char *sData, uint16_t wL
         pHandle,
         0x21 /* bmRequestType */,
         9 /* bRequest */,
-        0x035d /* wValue */,
+        0x035c /* wValue */,
         0 /* wIndex */,
         sData,
         wLength,

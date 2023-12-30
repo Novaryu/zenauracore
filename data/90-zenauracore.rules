@@ -1,0 +1,4 @@
+# udev rules for user control over Zen USB RGB keyboard backlight control (i.e "Zen Aura Core")
+
+# Zenbook UX7602ZM
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0b05", ATTRS{idProduct}=="8854", MODE="0666", TAG+="uaccess"

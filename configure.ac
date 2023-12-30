@@ -1,8 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([rogauracore], [1.6], [wildwilhelm@gmail.com])
-AC_CONFIG_SRCDIR([src/rogauracore.c])
+AC_INIT([zenauracore], [1.6], [wildwilhelm@gmail.com])
+AC_CONFIG_SRCDIR([src/zenauracore.c])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.9 foreign subdir-objects])
