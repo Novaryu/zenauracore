@@ -26,20 +26,16 @@ COMMAND should be one of:
 ```
 There are currently more modes supported by this laptop but I have not reverse-engineered them yet. Hopefully more to come.
 
-I have found that upon boot you will likely need to run
+I have found that upon boot you will likely need to run (if permissions error run with sudo):
 ```sh
-sudo zenauracore initialize_keyboard
+zenauracore initialize_keyboard
 ```
 
-In typical use, you will need root privileges to directly communicate
-with the laptop's keyboard.  This is easy to do with `sudo`.  Try some
-of these commands and see what works for you:
-
 ```sh
-sudo rogauracore single_static 0000ff
-sudo rogauracore single_static 00ff00
-sudo rogauracore single_static ffff00
-sudo rogauracore red
+rogauracore single_static 0000ff
+rogauracore single_static 00ff00
+rogauracore single_static ffff00
+rogauracore red
 ```
 
 If your keyboard remains dark, its brightness might have defaulted to 0. Try:
