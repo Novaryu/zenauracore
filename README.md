@@ -30,17 +30,20 @@ I have found that upon boot you will likely need to run (if permissions error ru
 ```sh
 zenauracore initialize_keyboard
 ```
-
+You can then change the color of the keyboard by passing the argument single_static followed by the hex color code:
 ```sh
-rogauracore single_static 0000ff
-rogauracore single_static 00ff00
-rogauracore single_static ffff00
-rogauracore red
+zenauracore single_static 0000ff
+zenauracore single_static 00ff00
+zenauracore single_static ffff00
+```
+Certain colors also work just like in rogauracore:
+```sh
+zenauracore red
 ```
 
 If your keyboard remains dark, its brightness might have defaulted to 0. Try:
 ```sh
-sudo rogauracore brightness 3
+sudo zenauracore brightness 3
 ```
 
 ## Dependencies
@@ -65,17 +68,9 @@ sudo pacman -S base-devel
 
 ## Installation
 
-Retrieve the `rogauracore` package, either through `curl` or `git`:
 ```sh
-VERSION=1.6
-curl -LOs https://github.com/wroberts/rogauracore/releases/download/$VERSION/rogauracore-$VERSION.tar.gz
-tar xf rogauracore-$VERSION.tar.gz
-cd rogauracore-$VERSION/
-```
-or
-```sh
-git clone https://github.com/wroberts/rogauracore.git
-cd rogauracore
+git clone https://github.com/Novaryu/zenauracore
+cd zenauracore
 autoreconf -i
 ```
 
