@@ -80,3 +80,4 @@ Then configure, make and install:
 make
 sudo make install
 ```
+Remember to either reload the udev rule or reboot for the changes to take effect.
