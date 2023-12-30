@@ -1,6 +1,7 @@
 # zenauracore - RGB keyboard control for the Asus Zenbook UX7602ZM
 
-Linux-compatible open-source libusb implementation forked from [rogauracore](https://github.com/wroberts/rogauracore)
+Linux-compatible open-source libusb implementation forked from [rogauracore](https://github.com/wroberts/rogauracore).
+
 Supports the Zenbook RGB keyboard with ID [0b05:8854](https://linux-hardware.org/index.php?id=usb:0b05-8854)
 
 ## Usage
