@@ -1,23 +1,13 @@
 /**
- * rogauracore
+ * zenauracore
+ *
+ * adapted from rogauracore
  * Copyright (c) 2019 Will Roberts
  * Copyright (c) 2019 Josh Ventura
- *
- * Author:        Will Roberts <wildwilhelm@gmail.com> (WKR)
- * Creation Date: 13 March 2019
  *
  * Description:
  *    RGB keyboard control for Asus ROG laptops
  *    Adapted for the Asus Zenbook UX7602ZM
- *
- * Revision Information:
- *
- *    (WKR) 13 March 2019
- *          - Boilerplate header added.
- *    (JPV) 28 November 2019
- *          - Added support for brightness adjustment.
- *          - Generalized speed specification mechanism to accomodate brightness
- *            or other integer values.
  *
  * \file zenauracore.c
  */
@@ -105,7 +95,7 @@ typedef struct {
 //  USB protocol for RGB keyboard
 // ------------------------------------------------------------
 
-const uint8_t SPEED_BYTE_VALUES[] = {0xe1, 0xeb, 0xf5};
+const uint8_t SPEED_BYTE_VALUES[] = {0x03, 0x02, 0x01};
 
 uint8_t speedByteValue(int speed) {
     return SPEED_BYTE_VALUES[speed - 1];
@@ -115,13 +105,23 @@ const int BRIGHTNESS_OFFSET = 4;
 uint8_t MESSAGE_BRIGHTNESS[MESSAGE_LENGTH] = {0x5a, 0xba, 0xc5, 0xc4};
 uint8_t MESSAGE_SET[MESSAGE_LENGTH] = {0x5d, 0xb5};
 uint8_t MESSAGE_APPLY[MESSAGE_LENGTH] = {0x5d, 0xb4};
+uint8_t MESSAGE_HEADER_SET[MESSAGE_LENGTH] = {0x5c, 0xa0};
+uint8_t MESSAGE_HEADER_APPLY[MESSAGE_LENGTH] = {0x5c, 0xa5};
 uint8_t MESSAGE_INITIALIZE_KEYBOARD[MESSAGE_LENGTH] = {0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e};
 
 void
 initMessage(uint8_t *msg) {
     memset(msg, 0, MESSAGE_LENGTH);
-    msg[0] = 0x5d;
-    msg[1] = 0xb3;
+}
+
+void setHeader(uint8_t *m, int index) {
+    m[0] = 0x5c;
+    if (index == 0) {
+        m[1] = 0xa0;
+    }
+    if (index == 1) {
+        m[1] = 0xa5;
+    }
 }
 
 void
@@ -130,13 +130,7 @@ single_static(Arguments *args, Messages *outputs) {
     outputs->nMessages = 2;
 	for (int i = 0; i < 2; ++i) {
 		uint8_t *m = outputs->messages[i];
-		m[0] = 0x5c;
-		if (i == 0) {
-		m[1] = 0xa0;
-		}
-		if (i == 1) {
-		m[1] = 0xa5;
-		}
+		setHeader(m, i);
 		m[2] = 0x00;
 		m[3] = 0x00;
 		m[4] = args->colors[0].nRed;
@@ -145,95 +139,100 @@ single_static(Arguments *args, Messages *outputs) {
 	}
 }
 
+void
+single_strobe(Arguments *args, Messages *outputs) {
+    V(printf("single_static\n"));
+    outputs->nMessages = 2;
+	for (int i = 0; i < 2; ++i) {
+		uint8_t *m = outputs->messages[i];
+		setHeader(m, i);
+		m[2] = 0x00;
+		m[3] = 0x0a;
+		m[4] = args->colors[0].nRed;
+		m[5] = args->colors[0].nGreen;
+		m[6] = args->colors[0].nBlue;
+		m[7] = speedByteValue(args->scalars[0]);
+	}
+}
 
 void
 single_breathing(Arguments *args, Messages *outputs) {
-    V(printf("single_breathing\n"));
-    outputs->nMessages = 1;
-    uint8_t *m = outputs->messages[0];
-    initMessage(m);
-    m[3] = 1;
-    m[4] = args->colors[0].nRed;
-    m[5] = args->colors[0].nGreen;
-    m[6] = args->colors[0].nBlue;
-    m[7] = speedByteValue(args->scalars[0]);
-    m[9] = 1;
-    m[10] = args->colors[1].nRed;
-    m[11] = args->colors[1].nGreen;
-    m[12] = args->colors[1].nBlue;
+    V(printf("single_static\n"));
+    outputs->nMessages = 2;
+	for (int i = 0; i < 2; ++i) {
+		uint8_t *m = outputs->messages[i];
+		setHeader(m, i);
+		m[2] = 0x00;
+		m[3] = 0x01;
+		m[4] = args->colors[0].nRed;
+		m[5] = args->colors[0].nGreen;
+		m[6] = args->colors[0].nBlue;
+		m[7] = speedByteValue(args->scalars[0]);
+	}
 }
 
 void
-single_colorcycle(Arguments *args, Messages *outputs) {
-    V(printf("single_colorcycle\n"));
-    outputs->nMessages = 1;
-    uint8_t *m = outputs->messages[0];
-    initMessage(m);
-    m[3] = 2;
-    m[4] = 0xff;
-    m[7] = speedByteValue(args->scalars[0]);
+colorcycle(Arguments *args, Messages *outputs) {
+    V(printf("single_static\n"));
+    outputs->nMessages = 2;
+	for (int i = 0; i < 2; ++i) {
+		uint8_t *m = outputs->messages[i];
+		setHeader(m, i);
+		m[2] = 0x00;
+		m[3] = 0x02;
+		m[4] = 0x00; 
+		m[5] = 0x00;
+		m[6] = 0x00;
+		m[7] = speedByteValue(args->scalars[0]);
+	}
 }
 
 void
-multi_static(Arguments *args, Messages *outputs) {
-    V(printf("multi_static\n"));
-    outputs->nMessages = 4;
-    for (int i = 0; i < 4; ++i) {
-        uint8_t *m = outputs->messages[i];
-        initMessage(m);
-        m[2] = i + 1;
-        m[4] = args->colors[i].nRed;
-        m[5] = args->colors[i].nGreen;
-        m[6] = args->colors[i].nBlue;
-        m[7] = 0xeb;
-    }
+rainbowcycle(Arguments *args, Messages *outputs) {
+    V(printf("single_static\n"));
+    outputs->nMessages = 2;
+	for (int i = 0; i < 2; ++i) {
+		uint8_t *m = outputs->messages[i];
+		setHeader(m, i);
+		m[2] = 0x00;
+		m[3] = 0x03;
+		m[4] = 0x00; 
+		m[5] = 0x00;
+		m[6] = 0x00;
+		m[7] = speedByteValue(args->scalars[0]);
+	}
 }
 
 void
-multi_breathing(Arguments *args, Messages *outputs) {
-    V(printf("multi_breathing\n"));
-    outputs->nMessages = 4;
-    for (int i = 0; i < 4; ++i) {
-        uint8_t *m = outputs->messages[i];
-        initMessage(m);
-        m[2] = i + 1;
-        m[3] = 1;
-        m[4] = args->colors[i].nRed;
-        m[5] = args->colors[i].nGreen;
-        m[6] = args->colors[i].nBlue;
-        m[7] = speedByteValue(args->scalars[0]);
-    }
+raindrop(Arguments *args, Messages *outputs) {
+    V(printf("single_static\n"));
+    outputs->nMessages = 2;
+	for (int i = 0; i < 2; ++i) {
+		uint8_t *m = outputs->messages[i];
+		setHeader(m, i);
+		m[2] = 0x00;
+		m[3] = 0x05;
+		m[4] = 0x00; 
+		m[5] = 0x00;
+		m[6] = 0x00;
+		m[7] = speedByteValue(args->scalars[0]);
+	}
 }
 
 void
-rainbow_cycle(Arguments *args, Messages *outputs) {
-    static int ind_off = 0;
-    V(printf("rainbow_cycle\n"));
-    outputs->nMessages = 4;
-    for (int i = 0; i < 6; ++i) {
-        uint8_t *m = outputs->messages[i];
-        initMessage(m);
-        m[3] = 3;
-        m[4] = 0xff;
-        m[7] = speedByteValue(args->scalars[0]);
-    }
-}
-
-void
-
 set_brightness(Arguments *args, Messages *outputs) {
     V(printf("single_static\n"));
     memcpy(outputs->messages[0], MESSAGE_BRIGHTNESS, MESSAGE_LENGTH);
     outputs->messages[0][BRIGHTNESS_OFFSET] = args->scalars[0];
     outputs->nMessages = 1;
-    outputs->setAndApply = 0;
+    // outputs->setAndApply = 0;
 }
 
 void initialize_keyboard(Arguments *args, Messages *outputs) {
         V(printf("initialize_keyboard\n"));
     memcpy(outputs->messages[0], MESSAGE_INITIALIZE_KEYBOARD, MESSAGE_LENGTH);
     outputs->nMessages = 1;
-    outputs->setAndApply = 0;
+    // outputs->setAndApply = 0;
 }
 
 const uint8_t RED[] = { 0xff, 0x00, 0x00 };
@@ -300,16 +299,6 @@ black(Arguments *args, Messages *messages) {
     single_static(args, messages);
 }
 
-void
-rainbow(Arguments *args, Messages *messages) {
-    memcpy(&(args->colors[0]), RED, 3);
-    memcpy(&(args->colors[1]), YELLOW, 3);
-    memcpy(&(args->colors[2]), CYAN, 3);
-    memcpy(&(args->colors[3]), MAGENTA, 3);
-    multi_static(args, messages);
-}
-
-
 // ------------------------------------------------------------
 //  Command line argument parsing
 // ------------------------------------------------------------
@@ -317,14 +306,15 @@ rainbow(Arguments *args, Messages *messages) {
 #define SPEED { "SPEED", "speed", 1, 3 }
 #define BRIGHTNESS { "BRIGHTNESS", "brightness", 0, 3 }
 
-// Currently have commented-out entries not yet reverse-engineered
 const FunctionRecord FUNCTION_RECORDS[] = {
+    {"initialize_keyboard", &initialize_keyboard, 0, 0},
+    {"brightness", &set_brightness, 0, 1, {BRIGHTNESS}},
     {"single_static", &single_static, 1, 0},
-    // {"single_breathing", &single_breathing, 2, 1, {SPEED}},
-    // {"single_colorcycle", &single_colorcycle, 0, 1, {SPEED}},
-    // {"multi_static", &multi_static, 4, 0},
-    // {"multi_breathing", &multi_breathing, 4, 1, {SPEED}},
-    // {"rainbow_cycle", &rainbow_cycle, 0, 1, {SPEED}},
+    {"single_strobe", &single_strobe, 1, 1, {SPEED}},
+    {"single_breathing", &single_breathing, 1, 1, {SPEED}},
+    {"colorcycle", &colorcycle, 0, 1, {SPEED}},
+    {"rainbow", &rainbowcycle, 0, 1, {SPEED}},
+    {"raindrop", &raindrop, 0, 1, {SPEED}},
     {"red", &red, 0, 0},
     {"green", &green, 0, 0},
     {"blue", &blue, 0, 0},
@@ -334,9 +324,6 @@ const FunctionRecord FUNCTION_RECORDS[] = {
     {"magenta", &magenta, 0, 0},
     {"white", &white, 0, 0},
     {"black", &black, 0, 0},
-    // {"rainbow", &rainbow, 0, 0},
-    {"brightness", &set_brightness, 0, 1, {BRIGHTNESS}},
-    {"initialize_keyboard", &initialize_keyboard, 0, 0},
 };
 
 const int NUM_FUNCTION_RECORDS = (int)(sizeof(FUNCTION_RECORDS) / sizeof(FUNCTION_RECORDS[0]));
@@ -344,9 +331,9 @@ const int NUM_FUNCTION_RECORDS = (int)(sizeof(FUNCTION_RECORDS) / sizeof(FUNCTIO
 void
 usage() {
     printf("%s - RGB keyboard control for Asus ROG laptops\n", PACKAGE_STRING);
-    printf("(c) 2019 Will Roberts\n\n");
+    printf("Adapted from rogauracore(c) 2019 Will Roberts\n\n");
     printf("Usage:\n");
-    printf("   rogauracore COMMAND ARGUMENTS\n\n");
+    printf("   zenauracore COMMAND ARGUMENTS\n\n");
     printf("COMMAND should be one of:\n");
     for (int i = 0; i < NUM_FUNCTION_RECORDS; ++i) {
         printf("   %s\n", FUNCTION_RECORDS[i].szName);
@@ -385,6 +372,7 @@ parseScalar(char *arg, ScalarDef type, int *pResult) {
         return -1;
     }
     *pResult = nSpeed;
+	V(printf("interpreted speed %d\n", *pResult));
     return 0;
 }
 
@@ -655,7 +643,7 @@ exit:
 int
 main(int argc, char **argv) {
     Messages messages;
-    messages.setAndApply = 1;
+    messages.setAndApply = 0;
     if (parseArguments(argc, argv, &messages) == 0) {
         return handleUsb(&messages);
     }
