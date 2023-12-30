@@ -20,8 +20,7 @@ COMMAND should be one of:
    rainbow [speed]
    raindrop [speed]
 ```
-Color can be any three-color hex code such as ff0000 for red or ffffff for white.
-
+Color can be any three-color hex code such as ff0000 for red or ffffff for white. 
 Speed can be any integer from 1-3.
 
 I believe this is all of the supported modes for this laptop. Let me know if I'm missing any.
