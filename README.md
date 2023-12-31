@@ -43,7 +43,7 @@ I have found that upon boot you will likely need to run (if permissions error ru
 ```sh
 zenauracore initialize_keyboard
 ```
-You can then change the color of the keyboard by passing the argument single_static followed by the hex color code:
+You can then change the color of the keyboard by passing the argument static followed by the hex color code:
 ```sh
 zenauracore static 0000ff
 zenauracore static 00ff00
