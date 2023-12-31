@@ -434,7 +434,7 @@ parseArguments(int argc, char **argv, Messages *messages) {
                 printf("no arguments");
             }
         }
-        printf(":\n   rogauracore %s ", pDesiredFunc->szName);
+        printf(":\n   zenauracore %s ", pDesiredFunc->szName);
         for (int i = 0; i < pDesiredFunc->nColors; i++) {
             printf("COLOR%d ", i+1);
         }
