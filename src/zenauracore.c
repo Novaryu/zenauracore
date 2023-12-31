@@ -242,7 +242,8 @@ const uint8_t YELLOW[] = { 0xff, 0xff, 0x00 };
 const uint8_t GOLD[] = { 0xff, 0x8C, 0x00 };
 const uint8_t CYAN[] = { 0x00, 0xff, 0xff };
 const uint8_t MAGENTA[] = { 0xff, 0x00, 0xff };
-const uint8_t WHITE[] = { 0xff, 0xff, 0xff };
+// For some reason ffffff turns the keyboard sort of yellowish, using feffff
+const uint8_t WHITE[] = { 0xfe, 0xff, 0xff };
 const uint8_t BLACK[] = { 0x00, 0x00, 0x00 };
 
 void
