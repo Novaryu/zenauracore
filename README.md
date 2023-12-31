@@ -20,7 +20,7 @@ Supported Commands [Arguments]:
    rainbow [speed]
    raindrop [speed]
 ```
-Color can be any three-color hex code such as ff0000 for red or ffffff for white.  
+Color can be any three-color hex code such as ff0000 for red or 00ff00 for green, etc.
 Speed can be any integer from 1-3.
 
 I believe this is all of the supported modes for this laptop. Let me know if I'm missing any.
@@ -39,6 +39,9 @@ It also supports these simple shortcut commands for simple static colors:
    white
    black
 ```
+Note: It might be a hardware issue, but the color #ffffff seems to make my keyboard yellowish. I've implemented white as #feffff as a workaround.
+All other colors work as intended.
+
 I have found that upon boot you will likely need to run (if permissions error run with sudo):
 ```sh
 zenauracore initialize_keyboard
