@@ -44,6 +44,9 @@ extern int errno;
 #include <stdint.h>
 #include <libusb-1.0/libusb.h>
 
+// This keyboard uses a very long message length
+// to allow for setting per-key RGB values.
+// This implementation does not take advantage of this.
 #define MESSAGE_LENGTH 64
 #define MAX_NUM_MESSAGES 6
 #define MAX_NUM_COLORS 4
@@ -124,6 +127,12 @@ void setHeader(uint8_t *m, int index) {
     }
 }
 
+void setTail(uint8_t *m, int index) {
+	for (int i = index; i < MESSAGE_LENGTH; ++i) {
+		m[i] = 0x00;
+	}
+}
+
 void
 single_static(Arguments *args, Messages *outputs) {
     V(printf("single_static\n"));
@@ -136,6 +145,7 @@ single_static(Arguments *args, Messages *outputs) {
 		m[4] = args->colors[0].nRed;
 		m[5] = args->colors[0].nGreen;
 		m[6] = args->colors[0].nBlue;
+		setTail(m, 7);
 	}
 }
 
@@ -152,6 +162,7 @@ single_strobe(Arguments *args, Messages *outputs) {
 		m[5] = args->colors[0].nGreen;
 		m[6] = args->colors[0].nBlue;
 		m[7] = speedByteValue(args->scalars[0]);
+		setTail(m, 8);
 	}
 }
 
@@ -168,6 +179,7 @@ single_breathing(Arguments *args, Messages *outputs) {
 		m[5] = args->colors[0].nGreen;
 		m[6] = args->colors[0].nBlue;
 		m[7] = speedByteValue(args->scalars[0]);
+		setTail(m, 8);
 	}
 }
 
@@ -184,6 +196,7 @@ colorcycle(Arguments *args, Messages *outputs) {
 		m[5] = 0x00;
 		m[6] = 0x00;
 		m[7] = speedByteValue(args->scalars[0]);
+		setTail(m, 8);
 	}
 }
 
@@ -200,6 +213,7 @@ rainbowcycle(Arguments *args, Messages *outputs) {
 		m[5] = 0x00;
 		m[6] = 0x00;
 		m[7] = speedByteValue(args->scalars[0]);
+		setTail(m, 8);
 	}
 }
 
@@ -216,6 +230,7 @@ raindrop(Arguments *args, Messages *outputs) {
 		m[5] = 0x00;
 		m[6] = 0x00;
 		m[7] = speedByteValue(args->scalars[0]);
+		setTail(m, 8);
 	}
 }
 
@@ -225,14 +240,12 @@ set_brightness(Arguments *args, Messages *outputs) {
     memcpy(outputs->messages[0], MESSAGE_BRIGHTNESS, MESSAGE_LENGTH);
     outputs->messages[0][BRIGHTNESS_OFFSET] = args->scalars[0];
     outputs->nMessages = 1;
-    // outputs->setAndApply = 0;
 }
 
 void initialize_keyboard(Arguments *args, Messages *outputs) {
         V(printf("initialize_keyboard\n"));
     memcpy(outputs->messages[0], MESSAGE_INITIALIZE_KEYBOARD, MESSAGE_LENGTH);
     outputs->nMessages = 1;
-    // outputs->setAndApply = 0;
 }
 
 const uint8_t RED[] = { 0xff, 0x00, 0x00 };
