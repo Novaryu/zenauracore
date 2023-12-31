@@ -243,6 +243,7 @@ const uint8_t ORANGE[] = { 0xff, 0x44, 0x00 };
 const uint8_t GOLD[] = { 0xff, 0x8C, 0x00 };
 const uint8_t CYAN[] = { 0x00, 0xff, 0xff };
 const uint8_t MAGENTA[] = { 0xff, 0x00, 0xff };
+const uint8_t PINK[] = { 0xff, 0x00, 0x55 };
 // For some reason ffffff turns the keyboard sort of yellowish, using feffff
 const uint8_t WHITE[] = { 0xfe, 0xff, 0xff };
 const uint8_t BLACK[] = { 0x00, 0x00, 0x00 };
@@ -296,6 +297,12 @@ magenta(Arguments *args, Messages *messages) {
 }
 
 void
+pink(Arguments *args, Messages *messages) {
+    memcpy(args->colors, PINK, 3);
+    single_static(args, messages);
+}
+
+void
 white(Arguments *args, Messages *messages) {
     memcpy(args->colors, WHITE, 3);
     single_static(args, messages);
@@ -331,6 +338,7 @@ const FunctionRecord FUNCTION_RECORDS[] = {
     {"gold", &gold, 0, 0},
     {"cyan", &cyan, 0, 0},
     {"magenta", &magenta, 0, 0},
+    {"pink", &pink, 0, 0},
     {"white", &white, 0, 0},
     {"black", &black, 0, 0},
 };

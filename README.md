@@ -35,6 +35,7 @@ It also supports these simple shortcut commands for simple static colors:
    gold
    cyan
    magenta
+   pink
    white
    black
 ```
