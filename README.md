@@ -13,9 +13,9 @@ Usage:
 Supported Commands [Arguments]:
    initialize_keyboard
    brightness [1-3]
-   single_static [color]
-   single_strobe [color] [speed]
-   single_breathing [color] [speed]
+   static [color]
+   strobe [color] [speed]
+   breathing [color] [speed]
    colorcycle [speed]
    rainbow [speed]
    raindrop [speed]
@@ -45,9 +45,9 @@ zenauracore initialize_keyboard
 ```
 You can then change the color of the keyboard by passing the argument single_static followed by the hex color code:
 ```sh
-zenauracore single_static 0000ff
-zenauracore single_static 00ff00
-zenauracore single_static ffff00
+zenauracore static 0000ff
+zenauracore static 00ff00
+zenauracore static ffff00
 ```
 You can also pass in any supported color above as an argument:
 ```sh
