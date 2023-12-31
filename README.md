@@ -31,6 +31,7 @@ It also supports these simple shortcut commands for simple static colors:
    green
    blue
    yellow
+   orange
    gold
    cyan
    magenta
