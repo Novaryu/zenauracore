@@ -337,9 +337,9 @@ black(Arguments *args, Messages *messages) {
 const FunctionRecord FUNCTION_RECORDS[] = {
     {"initialize_keyboard", &initialize_keyboard, 0, 0},
     {"brightness", &set_brightness, 0, 1, {BRIGHTNESS}},
-    {"single_static", &single_static, 1, 0},
-    {"single_strobe", &single_strobe, 1, 1, {SPEED}},
-    {"single_breathing", &single_breathing, 1, 1, {SPEED}},
+    {"static", &single_static, 1, 0},
+    {"strobe", &single_strobe, 1, 1, {SPEED}},
+    {"breathing", &single_breathing, 1, 1, {SPEED}},
     {"colorcycle", &colorcycle, 0, 1, {SPEED}},
     {"rainbow", &rainbowcycle, 0, 1, {SPEED}},
     {"raindrop", &raindrop, 0, 1, {SPEED}},
