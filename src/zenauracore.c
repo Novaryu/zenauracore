@@ -76,7 +76,6 @@ typedef struct {
 typedef struct {
     int nMessages;
     uint8_t messages[MAX_NUM_MESSAGES][MESSAGE_LENGTH];
-    int setAndApply;
 } Messages;
 
 typedef struct {
@@ -106,10 +105,6 @@ uint8_t speedByteValue(int speed) {
 
 const int BRIGHTNESS_OFFSET = 4;
 uint8_t MESSAGE_BRIGHTNESS[MESSAGE_LENGTH] = {0x5a, 0xba, 0xc5, 0xc4};
-uint8_t MESSAGE_SET[MESSAGE_LENGTH] = {0x5d, 0xb5};
-uint8_t MESSAGE_APPLY[MESSAGE_LENGTH] = {0x5d, 0xb4};
-uint8_t MESSAGE_HEADER_SET[MESSAGE_LENGTH] = {0x5c, 0xa0};
-uint8_t MESSAGE_HEADER_APPLY[MESSAGE_LENGTH] = {0x5c, 0xa5};
 uint8_t MESSAGE_INITIALIZE_KEYBOARD[MESSAGE_LENGTH] = {0x5a, 0x41, 0x53, 0x55, 0x53, 0x20, 0x54, 0x65, 0x63, 0x68, 0x2e, 0x49, 0x6e, 0x63, 0x2e};
 
 void
@@ -151,7 +146,7 @@ single_static(Arguments *args, Messages *outputs) {
 
 void
 single_strobe(Arguments *args, Messages *outputs) {
-    V(printf("single_static\n"));
+    V(printf("single_strobe\n"));
     outputs->nMessages = 2;
 	for (int i = 0; i < 2; ++i) {
 		uint8_t *m = outputs->messages[i];
@@ -168,7 +163,7 @@ single_strobe(Arguments *args, Messages *outputs) {
 
 void
 single_breathing(Arguments *args, Messages *outputs) {
-    V(printf("single_static\n"));
+    V(printf("single_breathing\n"));
     outputs->nMessages = 2;
 	for (int i = 0; i < 2; ++i) {
 		uint8_t *m = outputs->messages[i];
@@ -185,7 +180,7 @@ single_breathing(Arguments *args, Messages *outputs) {
 
 void
 colorcycle(Arguments *args, Messages *outputs) {
-    V(printf("single_static\n"));
+    V(printf("colorcycle\n"));
     outputs->nMessages = 2;
 	for (int i = 0; i < 2; ++i) {
 		uint8_t *m = outputs->messages[i];
@@ -202,7 +197,7 @@ colorcycle(Arguments *args, Messages *outputs) {
 
 void
 rainbowcycle(Arguments *args, Messages *outputs) {
-    V(printf("single_static\n"));
+    V(printf("rainbowcycle\n"));
     outputs->nMessages = 2;
 	for (int i = 0; i < 2; ++i) {
 		uint8_t *m = outputs->messages[i];
@@ -219,7 +214,7 @@ rainbowcycle(Arguments *args, Messages *outputs) {
 
 void
 raindrop(Arguments *args, Messages *outputs) {
-    V(printf("single_static\n"));
+    V(printf("raindrop\n"));
     outputs->nMessages = 2;
 	for (int i = 0; i < 2; ++i) {
 		uint8_t *m = outputs->messages[i];
@@ -236,7 +231,7 @@ raindrop(Arguments *args, Messages *outputs) {
 
 void
 set_brightness(Arguments *args, Messages *outputs) {
-    V(printf("single_static\n"));
+    V(printf("brightness\n"));
     memcpy(outputs->messages[0], MESSAGE_BRIGHTNESS, MESSAGE_LENGTH);
     outputs->messages[0][BRIGHTNESS_OFFSET] = args->scalars[0];
     outputs->nMessages = 1;
@@ -643,14 +638,6 @@ handleUsb(Messages *pMessages) {
     }
     if (nRetval < 0) goto release;
     V(printf("Successfully sent all messages.\n"));
-    if (pMessages->setAndApply) {
-        nRetval = controlTransfer(pHandle, MESSAGE_SET, MESSAGE_LENGTH);
-        if (nRetval < 0) goto release;
-        V(printf("Sent SET message.\n"));
-        nRetval = controlTransfer(pHandle, MESSAGE_APPLY, MESSAGE_LENGTH);
-        if (nRetval < 0) goto release;
-        V(printf("Sent APPLY message.\n"));
-    }
 
 release:
     libusb_release_interface(pHandle, bInterfaceNumber);
@@ -673,7 +660,6 @@ exit:
 int
 main(int argc, char **argv) {
     Messages messages;
-    messages.setAndApply = 0;
     if (parseArguments(argc, argv, &messages) == 0) {
         return handleUsb(&messages);
     }
